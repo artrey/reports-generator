@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Отправить отчет{% endblock title %}
+
+{% block content %}
+    <a href="{% url 'logout' %}">Test</a>
+    <h2>Регистрация</h2>
+    <form action="{% url 'send_report' %}" method="post">
+        {% csrf_token %}
+        {% for field in form %}
+            <div class="row">{{ field.errors }}</div>
+            <div class="row">{{ field.label_tag }}</div>
+            <div class="row">{{ field }}</div>
+        {% endfor %}
+        <button class="btn btn-light mt-3" type="submit">Зарегистрироваться</button>
+    </form>
+{% endblock %}
