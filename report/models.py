@@ -6,7 +6,14 @@ class Group(models.Model):
     title = models.CharField(verbose_name='Title', max_length=32)
     upload_link = models.CharField(verbose_name='Upload link', max_length=256)
     users = models.ManyToManyField(User, related_name='student_groups',
-                                   verbose_name='Users')
+                                   verbose_name='Users', blank=True)
+
+    @property
+    def users_count(self) -> int:
+        return self.users.count()
+
+    def __str__(self) -> str:
+        return self.title
 
 
 class File(models.Model):
@@ -25,7 +32,7 @@ class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
     solution_text = models.TextField(verbose_name='Solution text')
     files = models.ManyToManyField(File, related_name='reports',
-                                   verbose_name='Files')
+                                   verbose_name='Files', blank=True)
     created_at = models.DateTimeField(verbose_name='Created at', auto_now_add=True)
     approved_at = models.DateTimeField(verbose_name='Approved at', null=True, blank=True)
     rejected_at = models.DateTimeField(verbose_name='Rejected at', null=True, blank=True)
