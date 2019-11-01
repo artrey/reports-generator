@@ -19,6 +19,9 @@ class Group(models.Model):
 class File(models.Model):
     path = models.CharField(verbose_name='Path to file', max_length=256)
 
+    def __str__(self) -> str:
+        return self.path
+
 
 class Task(models.Model):
     number = models.IntegerField(verbose_name='Number')
@@ -27,9 +30,14 @@ class Task(models.Model):
                                     related_name='tasks',
                                     verbose_name='Description')
 
+    def __str__(self) -> str:
+        return f'{self.number}. {self.title}'
+
 
 class Report(models.Model):
     task = models.ForeignKey(Task, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,
+                             verbose_name='User')
     solution_text = models.TextField(verbose_name='Solution text')
     files = models.ManyToManyField(File, related_name='reports',
                                    verbose_name='Files', blank=True)
@@ -37,3 +45,13 @@ class Report(models.Model):
     approved_at = models.DateTimeField(verbose_name='Approved at', null=True, blank=True)
     rejected_at = models.DateTimeField(verbose_name='Rejected at', null=True, blank=True)
     comment = models.TextField(verbose_name='Comment', null=True, blank=True)
+
+    class Meta:
+        ordering = '-created_at',
+
+    @property
+    def username(self) -> str:
+        return f'{self.user.last_name} {self.user.first_name}'
+
+    def __str__(self) -> str:
+        return f'{self.task} | {self.username}'
