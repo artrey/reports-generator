@@ -1,23 +1,13 @@
-from django.contrib.auth.models import User
 from django import forms
+
+from report.models import Report
 
 
 class ReportForm(forms.ModelForm):
-    username = forms.CharField(
-        label='Логин'
-    )
-
-    password1 = forms.CharField(
-        label='Пароль',
-        strip=False,
-        widget=forms.PasswordInput,
-    )
-    password2 = forms.CharField(
-        label='Подтверждение пароля',
-        widget=forms.PasswordInput,
-        strip=False
-    )
+    files = forms.FileField(widget=forms.ClearableFileInput(
+        attrs={'multiple': True}
+    ))
 
     class Meta:
-        model = User
-        fields = ('username',)
+        model = Report
+        fields = 'task', 'solution_text',

@@ -46,20 +46,12 @@ class StatusReportFilter(admin.SimpleListFilter):
     parameter_name = 'status'
 
     def lookups(self, request, model_admin):
-        return ((x, x) for x in (
-            'approved',
-            'rejected',
-            'verifying',
-        ))
+        return ((x, x) for x in Report.statuses().keys())
 
     def queryset(self, request, queryset):
-        value = self.value()
-        if value == 'approved':
-            return Report.approved_objects.all()
-        elif value == 'rejected':
-            return Report.rejected_objects.all()
-        elif value == 'verifying':
-            return Report.verifying_objects.all()
+        q = Report.statuses().get(self.value())
+        if q:
+            queryset = q.all()
         return queryset
 
 

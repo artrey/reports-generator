@@ -1,17 +1,16 @@
-{% extends 'base.html' %}
+{% extends 'report/base.html' %}
 
 {% block title %}Отправить отчет{% endblock title %}
 
-{% block content %}
-    <a href="{% url 'logout' %}">Test</a>
-    <h2>Регистрация</h2>
-    <form action="{% url 'send_report' %}" method="post">
+{% block report %}
+    <h2>Отправить отчет</h2>
+    <form action="{% url 'send_report' %}" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% for field in form %}
-            <div class="row">{{ field.errors }}</div>
             <div class="row">{{ field.label_tag }}</div>
             <div class="row">{{ field }}</div>
+            <div class="row">{{ field.errors }}</div>
         {% endfor %}
-        <button class="btn btn-light mt-3" type="submit">Зарегистрироваться</button>
+        <button class="btn btn-success mt-3" type="submit">Отправить</button>
     </form>
 {% endblock %}

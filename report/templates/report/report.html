@@ -1,0 +1,8 @@
+{% extends 'report/base.html' %}
+{% load report_filters %}
+
+{% block title %}Отчеты | {{ status|humanize_status }}{% endblock title %}
+
+{% block report %}
+    <p>{{ report }}</p>
+{% endblock %}

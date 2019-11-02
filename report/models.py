@@ -1,3 +1,5 @@
+from collections import OrderedDict
+
 from django.contrib.auth.models import User
 from django.db import models
 
@@ -57,6 +59,14 @@ class Report(models.Model):
     approved_objects = ApprovedReportManager()
     rejected_objects = RejectedReportManager()
     verifying_objects = VerifyingReportManager()
+
+    @staticmethod
+    def statuses() -> OrderedDict:
+        return OrderedDict({
+            'approved': Report.approved_objects,
+            'rejected': Report.rejected_objects,
+            'verifying': Report.verifying_objects,
+        })
 
     class Meta:
         ordering = '-created_at',
