@@ -4,13 +4,29 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
+from weasyprint import HTML, CSS
 
 from report.forms import ReportForm
 from report.models import Report, File
 
 
+raw_html = """<h2>gruohtrht rtgb rgh ruifbhirdtfbv hidtbghr</h2><h2>tbgih rtbgih tgij htbgivh itghd birghd bihg br</h2>
+<code class="php hljs">dfhfd
+s gdfgsdf\n
+s dfg\n
+s df\n
+h d\r\n
+fg j<br/>
+tfy
+jyujkgyjkguj f
+dg
+</code>"""
+raw_css = """@media print {h2 {page-break-before: always;} .php{border: solid black 1px}}"""
+
+
 @staff_member_required
 def pdf_report_view(request, rid):
+    HTML(string=raw_html).render(stylesheets=[CSS(string=raw_css)]).write_pdf('test.pdf')
     report = get_object_or_404(Report, pk=rid)
     for f in report.files.all():
         print(f)
