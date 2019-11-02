@@ -1,10 +1,19 @@
-from django.contrib.auth.decorators import login_required
+from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.shortcuts import render, redirect
+from django.http import HttpResponse
+from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
 
 from report.forms import ReportForm
+from report.models import Report
+
+
+@staff_member_required
+def pdf_report(request, rid):
+    report = get_object_or_404(Report, pk=rid)
+    # TODO: gen report
+    return HttpResponse(str(report))
 
 
 class SendReportView(LoginRequiredMixin, FormView):

@@ -14,17 +14,13 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, reverse_lazy
+from django.urls import path, reverse_lazy, include
 from django.contrib.auth.views import LoginView, LogoutView
 
-from report.views import SendReportView
+from report.urls import urls
 
 urlpatterns = [
-    path('', SendReportView.as_view(), name='send_report'),
-    path('report/<int:rid>/', SendReportView.as_view(), name='report'),
-    path('approved/', SendReportView.as_view(), name='approved'),
-    path('rejected/', SendReportView.as_view(), name='rejected'),
-    path('verification/', SendReportView.as_view(), name='verification'),
+    path('', include(urls)),
     path('admin/', admin.site.urls),
     path('login/', LoginView.as_view(template_name='auth/login.html'), name='login'),
     path('logout/', LogoutView.as_view(next_page=reverse_lazy('login')), name='logout'),

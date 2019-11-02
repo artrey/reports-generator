@@ -1,0 +1,10 @@
+{% extends 'admin/change_form.html' %}
+
+{% block form_top %}
+    {{ block.super }}
+    <div class="submit-row">
+        <a href="{% url 'pdf_report' object_id %}" target="_blank" rel="noreferrer noopener">Show preview</a>
+        <input type="submit" value="Approve" name="_approve" style="background-color: forestgreen">
+        <input type="submit" value="Reject" name="_reject" style="background-color: #ba2121">
+    </div>
+{% endblock %}
