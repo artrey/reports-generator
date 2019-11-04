@@ -1,38 +1,36 @@
+from os import makedirs
+from os.path import dirname
+
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import FileResponse
 from django.shortcuts import render, get_object_or_404
+from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView
-from weasyprint import HTML, CSS
+from weasyprint import HTML
 
 from report.forms import ReportForm
 from report.models import Report, File
 
 
-raw_html = """<h2>gruohtrht rtgb rgh ruifbhirdtfbv hidtbghr</h2><h2>tbgih rtbgih tgij htbgivh itghd birghd bihg br</h2>
-<code class="php hljs">dfhfd
-s gdfgsdf\n
-s dfg\n
-s df\n
-h d\r\n
-fg j<br/>
-tfy
-jyujkgyjkguj f
-dg
-</code>"""
-raw_css = """@media print {h2 {page-break-before: always;} .php{border: solid black 1px}}"""
+def pdf_report_path(report: Report) -> str:
+    return f'reports/{report.username}/' \
+           f'ООП_Отчёт_{report.task.number}' \
+           f'_{report.user.last_name}_{report.user.first_name}' \
+           f'_{report.user.student_groups.first().title}.pdf'
 
 
 @staff_member_required
 def pdf_report_view(request, rid):
-    HTML(string=raw_html).render(stylesheets=[CSS(string=raw_css)]).write_pdf('test.pdf')
     report = get_object_or_404(Report, pk=rid)
-    for f in report.files.all():
-        print(f)
-    # TODO: gen report
-    return HttpResponse(str(report))
+    pdf_filename = pdf_report_path(report)
+    makedirs(dirname(pdf_filename), exist_ok=True)
+    HTML(string=render_to_string('report/pdf_report_template.html', context={
+        'files': map(lambda x: print(x), report.files.all())
+    })).render().write_pdf(pdf_filename)
+    return FileResponse(open(pdf_filename, 'rb'))
 
 
 def reports_view(request):
