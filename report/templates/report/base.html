@@ -2,13 +2,30 @@
 
 {% block style %}
     <style>
+        .nav {
+            margin-top: 1em;
+            margin-bottom: 2em;
+        }
     </style>
 {% endblock %}
 
 {% block content %}
-    <header>
-        <a href="{% url 'logout' %}">Test</a>
-    </header>
+    <nav class="navbar navbar-light navbar-expand-md justify-content-between align-items-center nav">
+        <div class="nav-item-panel">
+            <a class="btn btn-light" href="{% url 'send_report' %}">Отправить отчет</a>
+        </div>
+        <div class="nav-item-panel">
+            Привет, {{ user.get_full_name }}!
+        </div>
+        {% if user.is_superuser %}
+            <div class="nav-item-panel">
+                <a href="/admin/" class="btn btn-primary">Панель администратора</a>
+            </div>
+        {% endif %}
+        <div class="nav-item-panel">
+            <a href="{% url 'logout' %}" class="btn btn-info">Выйти</a>
+        </div>
+    </nav>
 
     {% block report %}{% endblock %}
 {% endblock content %}

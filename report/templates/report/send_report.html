@@ -3,14 +3,15 @@
 {% block title %}Отправить отчет{% endblock title %}
 
 {% block report %}
-    <h2>Отправить отчет</h2>
-    <form action="{% url 'send_report' %}" method="post" enctype="multipart/form-data">
+    <h2 class="text-center">Отправить отчет</h2>
+
+    <form action="{% url 'send_report' %}" method="post" enctype="multipart/form-data" class="text-center">
         {% csrf_token %}
-        {% for field in form %}
-            <div class="row">{{ field.label_tag }}</div>
-            <div class="row">{{ field }}</div>
-            <div class="row">{{ field.errors }}</div>
-        {% endfor %}
+
+        {% include 'report/form_element.html' with field_id='id_task' field_label='Задание' field=form.task %}
+        {% include 'report/form_element.html' with field_id='id_solution_text' field_label='Ход рассуждений' field=form.solution_text %}
+        {% include 'report/form_element.html' with field_id='id_files' field_label='Исходные файлы' field=form.files %}
+
         <button class="btn btn-success mt-3" type="submit">Отправить</button>
     </form>
 {% endblock %}

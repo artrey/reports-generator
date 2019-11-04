@@ -11,3 +11,6 @@ class ReportForm(forms.ModelForm):
     class Meta:
         model = Report
         fields = 'task', 'solution_text',
+        widgets = {
+            'solution_text': forms.Textarea(attrs={'style': 'width: 100%;'}),
+        }

@@ -60,6 +60,14 @@ class Report(models.Model):
     rejected_objects = RejectedReportManager()
     verifying_objects = VerifyingReportManager()
 
+    @property
+    def status(self) -> str:
+        if self.approved_at:
+            return 'approved'
+        elif self.rejected_at:
+            return 'rejected'
+        return 'verifying'
+
     @staticmethod
     def statuses() -> OrderedDict:
         return OrderedDict({

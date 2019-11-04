@@ -1,8 +1,15 @@
 {% extends 'report/base.html' %}
 {% load report_filters %}
 
-{% block title %}Отчеты | {{ status|humanize_status }}{% endblock title %}
+{% block title %}Отчет | {{ report.task }} | {{ report.username }}{% endblock title %}
 
 {% block report %}
-    <p>{{ report }}</p>
+    <div class="row justify-content-center">
+        <div style="display: inline-block">
+            <p><b>Задание:</b> {{ report.task }}</p>
+            <p><b>Исполнитель:</b> {{ report.username }}</p>
+            <p><b>Отчет отправлен:</b> {{ report.created_at }}</p>
+            <p><b>Статус:</b> {{ report.status|humanize_status }}</p>
+        </div>
+    </div>
 {% endblock %}

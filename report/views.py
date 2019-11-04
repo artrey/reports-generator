@@ -1,4 +1,5 @@
 from django.contrib.admin.views.decorators import staff_member_required
+from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
@@ -43,8 +44,9 @@ def reports_view(request):
     })
 
 
+@login_required
 def report_view(request, rid: int):
-    report = get_object_or_404(Report, pk=rid)
+    report = get_object_or_404(Report, pk=rid, user=request.user)
     return render(request, 'report/report.html', context={
         'report': report,
     })
