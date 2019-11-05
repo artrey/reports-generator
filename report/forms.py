@@ -5,28 +5,32 @@ from report.models import Report, Task
 
 
 class TaskAdminForm(forms.ModelForm):
-    description = forms.CharField(widget=CKEditorUploadingWidget())
-
     class Meta:
         model = Task
         fields = '__all__'
+        widgets = {
+            'description': CKEditorUploadingWidget(),
+        }
 
 
 class ReportAdminForm(forms.ModelForm):
-    solution_text = forms.CharField(widget=CKEditorUploadingWidget())
-    comment = forms.CharField(widget=CKEditorUploadingWidget())
-
     class Meta:
         model = Report
         fields = '__all__'
+        widgets = {
+            'solution_text': CKEditorUploadingWidget(),
+            'comment': CKEditorUploadingWidget(),
+        }
 
 
 class ReportForm(forms.ModelForm):
-    solution_text = forms.CharField(widget=CKEditorUploadingWidget())
     files = forms.FileField(widget=forms.ClearableFileInput(
         attrs={'multiple': True}
     ))
-
+    
     class Meta:
         model = Report
         fields = 'task', 'solution_text', 'files',
+        widgets = {
+            'solution_text': CKEditorUploadingWidget(),
+        }
