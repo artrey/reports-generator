@@ -21,7 +21,7 @@ class Group(models.Model):
 class Task(models.Model):
     number = models.IntegerField(verbose_name='Number')
     title = models.CharField(verbose_name='Title', max_length=128)
-    description = models.FileField(verbose_name='Description', upload_to='tasks/')
+    description = models.TextField(verbose_name='Description')
 
     def __str__(self) -> str:
         return f'{self.number}. {self.title}'

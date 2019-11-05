@@ -7,6 +7,7 @@
 
     <form action="{% url 'send_report' %}" method="post" enctype="multipart/form-data" class="text-center">
         {% csrf_token %}
+        {{ form.media }}
 
         {% include 'report/form_element.html' with field_id='id_task' field_label='Задание' field=form.task %}
         {% include 'report/form_element.html' with field_id='id_solution_text' field_label='Ход рассуждений' field=form.solution_text %}

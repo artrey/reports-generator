@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
+from report.forms import TaskAdminForm, ReportAdminForm
 from .models import Group, Task, Report
 
 
@@ -23,6 +24,7 @@ class GroupAdmin(admin.ModelAdmin):
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
+    form = TaskAdminForm
     list_display = 'number', 'title',
     list_display_links = 'title',
 
@@ -57,6 +59,7 @@ class StatusReportFilter(admin.SimpleListFilter):
 
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
+    form = ReportAdminForm
     change_form_template = 'report/report_admin_form.html'
 
     list_display = (
