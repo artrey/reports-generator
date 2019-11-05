@@ -12,4 +12,7 @@
 
 <h2>gruohtrht rtgb rgh ruifbhirdtfbv hidtbghr</h2>
 <h2>tbgih rtbgih tgij htbgivh itghd birghd bihg br</h2>
-<code class="g">test code</code>
+{% for f in files %}
+    <h2>{{ f.name }}</h2>
+    <code>{{ f }}</code>
+{% endfor %}
