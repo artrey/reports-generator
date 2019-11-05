@@ -25,9 +25,9 @@ class ReportAdminForm(forms.ModelForm):
 
 class ReportForm(forms.ModelForm):
     files = forms.FileField(widget=forms.ClearableFileInput(
-        attrs={'multiple': True}
+        attrs={'multiple': True, 'accept': 'text/*'}
     ))
-    
+
     class Meta:
         model = Report
         fields = 'task', 'solution_text', 'files',
