@@ -5,11 +5,11 @@ from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
 from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
-from django.views.generic import FormView
+from django.views.generic import FormView, ListView
 from weasyprint import HTML
 
 from report.forms import ReportForm
-from report.models import Report, File
+from report.models import Report, File, Task
 
 
 def pdf_report_path(report: Report) -> str:
@@ -23,8 +23,8 @@ def pdf_report_path(report: Report) -> str:
 def pdf_report_view(request, rid):
     report = get_object_or_404(Report, pk=rid)
     pdf_content = HTML(string=render_to_string('report/pdf_report_template.html', context={
-        'files': report.files.all()
-    })).render().write_pdf()
+        'report': report
+    }), base_url=request.build_absolute_uri()).render().write_pdf()
     return HttpResponse(pdf_content, content_type='application/pdf')
 
 
@@ -43,6 +43,19 @@ def report_view(request, rid: int):
     return render(request, 'report/report.html', context={
         'report': report,
     })
+
+
+class TasksView(ListView):
+    model = Task
+    template_name = 'report/tasks.html'
+
+
+def pdf_task_view(request, tid: int):
+    task = get_object_or_404(Task, pk=tid)
+    pdf_content = HTML(string=render_to_string('report/pdf_task_template.html', context={
+        'task': task
+    }), base_url=request.build_absolute_uri()).render().write_pdf()
+    return HttpResponse(pdf_content, content_type='application/pdf')
 
 
 class SendReportView(LoginRequiredMixin, FormView):

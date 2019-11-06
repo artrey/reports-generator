@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 
 
 class Group(models.Model):
@@ -22,6 +23,9 @@ class Task(models.Model):
     number = models.IntegerField(verbose_name='Number')
     title = models.CharField(verbose_name='Title', max_length=128)
     description = models.TextField(verbose_name='Description')
+
+    def get_absolute_url(self) -> str:
+        return reverse('task', args=(self.id,))
 
     def __str__(self) -> str:
         return f'{self.number}. {self.title}'

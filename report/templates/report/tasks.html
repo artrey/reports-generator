@@ -1,0 +1,11 @@
+{% extends 'report/base.html' %}
+
+{% block title %}Задачи{% endblock title %}
+
+{% block report %}
+    {% for task in object_list %}
+        <a href="{{ task.get_absolute_url }}" target="_blank" rel="noopener noreferrer">
+            Лабораторная работа {{ task.number }}. {{ task.title }}
+        </a>
+    {% endfor %}
+{% endblock %}
