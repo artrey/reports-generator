@@ -4,6 +4,7 @@ from django.utils import timezone
 from django.utils.safestring import mark_safe
 
 from report.forms import TaskAdminForm, ReportAdminForm
+from report.utils import build_report_pdf
 from .models import Group, Task, Report
 
 
@@ -84,7 +85,8 @@ class ReportAdmin(admin.ModelAdmin):
             obj.approved_at = timezone.now()
             obj.rejected_at = None
             obj.save()
-            # TODO: generate report + send to gdrive
+            pdf_content = build_report_pdf(obj, base_url=request.build_absolute_uri())
+            # TODO: send pdf_content to gdrive
         elif "_reject" in request.POST:
             obj.approved_at = None
             obj.rejected_at = timezone.now()

@@ -3,13 +3,12 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import HttpResponse
 from django.shortcuts import render, get_object_or_404
-from django.template.loader import render_to_string
 from django.urls import reverse, reverse_lazy
 from django.views.generic import FormView, ListView
-from weasyprint import HTML
 
 from report.forms import ReportForm
 from report.models import Report, File, Task
+from report.utils import build_report_pdf, build_task_pdf
 
 
 def pdf_report_path(report: Report) -> str:
@@ -22,19 +21,8 @@ def pdf_report_path(report: Report) -> str:
 @staff_member_required
 def pdf_report_view(request, rid):
     report = get_object_or_404(Report, pk=rid)
-    pdf_content = HTML(string=render_to_string('report/pdf_report_template.html', context={
-        'report': report
-    }), base_url=request.build_absolute_uri()).render().write_pdf()
+    pdf_content = build_report_pdf(report, base_url=request.build_absolute_uri())
     return HttpResponse(pdf_content, content_type='application/pdf')
-
-
-def reports_view(request):
-    status = request.GET.get('status')
-    reports = Report.statuses().get(status, Report.objects).filter(user=request.user)
-    return render(request, 'report/reports.html', context={
-        'status': status,
-        'reports': reports,
-    })
 
 
 @login_required
@@ -45,16 +33,15 @@ def report_view(request, rid: int):
     })
 
 
-class TasksView(ListView):
+class TasksView(LoginRequiredMixin, ListView):
     model = Task
     template_name = 'report/tasks.html'
 
 
+@login_required
 def pdf_task_view(request, tid: int):
     task = get_object_or_404(Task, pk=tid)
-    pdf_content = HTML(string=render_to_string('report/pdf_task_template.html', context={
-        'task': task
-    }), base_url=request.build_absolute_uri()).render().write_pdf()
+    pdf_content = build_task_pdf(task, base_url=request.build_absolute_uri())
     return HttpResponse(pdf_content, content_type='application/pdf')
 
 
