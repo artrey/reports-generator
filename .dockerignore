@@ -1,0 +1,14 @@
+# Ignore everything
+**
+
+# Allowed
+!report/**
+!reports_generator/**
+!templates/**
+!manage.py
+!requirements.txt
+
+# Override allowed
+.idea/**
+__pycache__/**
+*.sqlite3

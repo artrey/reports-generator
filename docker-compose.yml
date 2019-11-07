@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  backend:
+    image: artrey/reports-generator:$IMAGE
+    restart: unless-stopped
+    networks:
+      - reports-network
+    volumes:
+      - django-db:$SQLITE_PATH:rw
+      - django-media:$MEDIA_ROOT:rw
+      - django-static:$STATIC_ROOT:rw
+    env_file:
+      - .env
+
+  nginx:
+    image: nginx:alpine
+    restart: unless-stopped
+    networks:
+      - reports-network
+      - webproxy
+    depends_on:
+      - backend
+    expose:
+      - "80"
+    volumes:
+      - ./nginx/:/etc/nginx/conf.d/
+      - ./nginx/logs/:/var/log/nginx/
+      - django-media:$MEDIA_ROOT:ro
+      - django-static:$STATIC_ROOT:ro
+    env_file:
+      - .env
+
+volumes:
+  django-db: {}
+  django-static: {}
+  django-media: {}
+
+networks:
+  reports-network:
+    driver: bridge
+  webproxy:
+    external:
+      name: webproxy
