@@ -1,3 +1,4 @@
 Django
 weasyprint
 django-ckeditor
+google-api-python-client

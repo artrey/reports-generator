@@ -5,9 +5,20 @@ from django.db import models
 from django.urls import reverse
 
 
+class GoogleApiFolder(models.Model):
+    title = models.CharField(verbose_name='Title', max_length=64)
+    api_id = models.CharField(verbose_name='Google drive folder ID', max_length=128)
+
+    def __str__(self) -> str:
+        return self.title
+
+
 class Group(models.Model):
     title = models.CharField(verbose_name='Title', max_length=32, db_index=True)
-    upload_link = models.CharField(verbose_name='Upload link', max_length=256)
+    folder = models.ForeignKey(
+        GoogleApiFolder, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name='Google drive folder with group data'
+    )
     users = models.ManyToManyField(User, related_name='student_groups',
                                    verbose_name='Users', blank=True)
 
@@ -29,6 +40,21 @@ class Task(models.Model):
 
     def __str__(self) -> str:
         return f'{self.number}. {self.title}'
+
+
+class ReportsFolder(models.Model):
+    folder = models.ForeignKey(
+        GoogleApiFolder, on_delete=models.SET_NULL, null=True, blank=True,
+        verbose_name='Google drive folder for storing reports'
+    )
+    group = models.ForeignKey(
+        Group, on_delete=models.CASCADE,
+        verbose_name='Group', related_name='reports_folders'
+    )
+    task = models.ForeignKey(
+        Task, on_delete=models.CASCADE,
+        verbose_name='Task', related_name='reports_folders'
+    )
 
 
 class ApprovedReportManager(models.Manager):

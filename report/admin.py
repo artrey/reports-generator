@@ -1,11 +1,14 @@
+import typing
+
 from django.contrib import admin
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
 
-from report.forms import TaskAdminForm, ReportAdminForm
-from report.utils import build_report_pdf
-from .models import Group, Task, Report
+from .forms import TaskAdminForm, ReportAdminForm
+from . import gapi
+from .utils import build_report_pdf
+from .models import GoogleApiFolder, Group, Task, ReportsFolder, Report
 
 
 def make_link(href: str, title: str = None) -> str:
@@ -15,19 +18,42 @@ def make_link(href: str, title: str = None) -> str:
     )
 
 
+@admin.register(GoogleApiFolder)
+class GoogleApiFolderAdmin(admin.ModelAdmin):
+    list_display = 'title', 'api_id', 'link',
+
+    def link(self, obj: GoogleApiFolder) -> str:
+        return make_link(gapi.build_folder_link(obj.api_id), 'Open')
+
+
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = 'title', 'link', 'users_count',
 
-    def link(self, obj: Group) -> str:
-        return make_link(obj.upload_link)
+    def link(self, obj: Group) -> typing.Optional[str]:
+        if obj.folder:
+            return make_link(gapi.build_folder_link(obj.folder.api_id))
+        return None
 
 
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
-    list_display = 'number', 'title',
+    list_display = 'number', 'title', 'preview',
     list_display_links = 'title',
+
+    def preview(self, obj: Report) -> str:
+        return make_link(reverse('task', args=(obj.id,)), 'Open')
+
+
+@admin.register(ReportsFolder)
+class ReportsFolderAdmin(admin.ModelAdmin):
+    list_display = 'folder', 'group', 'task', 'link',
+    list_filter = 'group', 'task',
+    search_fields = 'group__title', 'task__title', 'folder__title',
+
+    def link(self, obj: ReportsFolder) -> str:
+        return make_link(gapi.build_folder_link(obj.folder.api_id))
 
 
 class FirstGroupFilter(admin.SimpleListFilter):
@@ -78,7 +104,7 @@ class ReportAdmin(admin.ModelAdmin):
     first_group.short_description = 'group'
 
     def preview(self, obj: Report) -> str:
-        return make_link(reverse('pdf_report', args=(obj.id,)), 'Отчёт')
+        return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
 
     def response_change(self, request, obj: Report):
         if "_approve" in request.POST:

@@ -140,4 +140,6 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+GAPI_SERVICE_ACCOUNT_FILE = os.getenv('GAPI_SERVICE_ACCOUNT_FILE')
+
 AdminSite.site_header = 'Reports generator'
