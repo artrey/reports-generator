@@ -1,6 +1,6 @@
 import typing
 
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.safestring import mark_safe
@@ -16,6 +16,12 @@ def make_link(href: str, title: str = None) -> str:
     return mark_safe(
         f'<a href="{href}" target="_blank" rel="noopener noreferrer">{title}</a>'
     )
+
+
+def build_report_name(report: Report) -> str:
+    return f'ООП_Отчёт_{report.task.number}' \
+           f'_{report.user.last_name}_{report.user.first_name}' \
+           f'_{report.user.student_groups.first().title}.pdf'
 
 
 @admin.register(GoogleApiFolder)
@@ -107,14 +113,25 @@ class ReportAdmin(admin.ModelAdmin):
         return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
 
     def response_change(self, request, obj: Report):
+        gapi.update_results('1VkUgZK3fPbkzyw9KZv7B_tffYG6NjzA1ktmvpTiIME8', '', '', 0, '')
         if "_approve" in request.POST:
             obj.approved_at = timezone.now()
             obj.rejected_at = None
             obj.save()
+
             pdf_content = build_report_pdf(obj, base_url=request.build_absolute_uri())
-            # TODO: send pdf_content to gdrive
+            folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
+            if folder:
+                file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)
+                # TODO: update google sheet: set file link and score
+                print(file_id)
+            else:
+                messages.add_message(request, messages.WARNING,
+                                     "Report wasn't upload to Google Drive. Reason: ReportsFolder not found")
+
         elif "_reject" in request.POST:
             obj.approved_at = None
             obj.rejected_at = timezone.now()
             obj.save()
+
         return super().response_change(request, obj)
