@@ -113,7 +113,10 @@ class ReportAdmin(admin.ModelAdmin):
         return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
 
     def response_change(self, request, obj: Report):
-        gapi.update_results('1VkUgZK3fPbkzyw9KZv7B_tffYG6NjzA1ktmvpTiIME8', '', '', 0, '')
+        gapi.update_results(
+            '1VkUgZK3fPbkzyw9KZv7B_tffYG6NjzA1ktmvpTiIME8',
+            obj, 'https://ya.ru'
+        )
         if "_approve" in request.POST:
             obj.approved_at = timezone.now()
             obj.rejected_at = None
