@@ -1,5 +1,6 @@
 import typing
 
+from django.conf import settings
 from django.contrib import admin, messages
 from django.urls import reverse
 from django.utils import timezone
@@ -113,24 +114,26 @@ class ReportAdmin(admin.ModelAdmin):
         return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
 
     def response_change(self, request, obj: Report):
-        gapi.update_results(
-            '1VkUgZK3fPbkzyw9KZv7B_tffYG6NjzA1ktmvpTiIME8',
-            obj, 'https://ya.ru'
-        )
         if "_approve" in request.POST:
             obj.approved_at = timezone.now()
             obj.rejected_at = None
             obj.save()
 
-            pdf_content = build_report_pdf(obj, base_url=request.build_absolute_uri())
-            folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
-            if folder:
-                file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)
-                # TODO: update google sheet: set file link and score
-                print(file_id)
-            else:
-                messages.add_message(request, messages.WARNING,
-                                     "Report wasn't upload to Google Drive. Reason: ReportsFolder not found")
+            try:
+                pdf_content = build_report_pdf(obj, base_url=request.build_absolute_uri())
+                folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
+                if folder:
+                    file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)
+                    gapi.update_results(settings.GAPI_RESULT_SHEET, obj, gapi.build_file_link(file_id))
+                else:
+                    messages.add_message(request, messages.WARNING,
+                                         "Report wasn't upload to Google Drive. Reason: ReportsFolder not found")
+
+            except StopIteration:
+                messages.add_message(request, messages.ERROR, f'Error: user or task not found in google sheet')
+
+            except Exception as ex:
+                messages.add_message(request, messages.ERROR, f'Some error occurred. Info: {ex}')
 
         elif "_reject" in request.POST:
             obj.approved_at = None
