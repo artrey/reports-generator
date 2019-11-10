@@ -10,6 +10,7 @@ services:
       - django-db:$SQLITE_PATH:rw
       - django-media:$MEDIA_ROOT:rw
       - django-static:$STATIC_ROOT:rw
+      - ./gapi/:/gapi/
     env_file:
       - .env
 
