@@ -35,6 +35,9 @@ class Task(models.Model):
     title = models.CharField(verbose_name='Title', max_length=128)
     description = models.TextField(verbose_name='Description')
 
+    class Meta:
+        ordering = 'number', 'title',
+
     def get_absolute_url(self) -> str:
         return reverse('task', args=(self.id,))
 
