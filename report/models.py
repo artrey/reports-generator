@@ -9,6 +9,9 @@ class GoogleApiFolder(models.Model):
     title = models.CharField(verbose_name='Title', max_length=64)
     api_id = models.CharField(verbose_name='Google drive folder ID', max_length=128)
 
+    class Meta:
+        ordering = 'title',
+
     def __str__(self) -> str:
         return self.title
 
@@ -21,6 +24,9 @@ class Group(models.Model):
     )
     users = models.ManyToManyField(User, related_name='student_groups',
                                    verbose_name='Users', blank=True)
+
+    class Meta:
+        ordering = 'title',
 
     @property
     def users_count(self) -> int:
@@ -58,6 +64,12 @@ class ReportsFolder(models.Model):
         Task, on_delete=models.CASCADE,
         verbose_name='Task', related_name='reports_folders'
     )
+
+    class Meta:
+        ordering = 'group', 'task',
+
+    def __str__(self) -> str:
+        return f'{self.folder} [{self.group} | {self.task}]'
 
 
 class ApprovedReportManager(models.Manager):

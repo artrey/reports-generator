@@ -36,6 +36,7 @@ class GoogleApiFolderAdmin(admin.ModelAdmin):
 @admin.register(Group)
 class GroupAdmin(admin.ModelAdmin):
     list_display = 'title', 'link', 'users_count',
+    filter_horizontal = 'users',
 
     def link(self, obj: Group) -> typing.Optional[str]:
         if obj.folder:
