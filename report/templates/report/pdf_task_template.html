@@ -1,3 +1,11 @@
-<h2 style="text-align: center">Лабораторная работа {{ task.number }}</h2>
-<h1 style="text-align: center">{{ task.title }}</h1>
-{{ task.description|safe }}
+<!DOCTYPE html>
+<html lang="ru">
+    <head>
+        <title>{{ task }}</title>
+    </head>
+    <body>
+        <h2 style="text-align: center">Лабораторная работа {{ task.number }}</h2>
+        <h1 style="text-align: center">{{ task.title }}</h1>
+        {{ task.description|safe }}
+    </body>
+</html>

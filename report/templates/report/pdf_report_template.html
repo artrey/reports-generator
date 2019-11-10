@@ -1,91 +1,95 @@
+<!DOCTYPE html>
+
 {% load report_filters %}
 
-<style>
-    * {
-        font-size: 100%;
-        font-family: calibri, serif;
-        font-weight: normal;
-        margin: 0;
-        padding: 0;
-    }
+<html lang="ru">
+    <head>
+        <title>{{ report }}</title>
+        <style>
+            * {
+                font-size: 100%;
+                font-family: calibri, serif;
+            }
 
-    @page {
-        margin: 1cm;
-    }
+            @page {
+                margin: 1cm;
+            }
 
-    body {
-        font-size: 16px;
-    }
+            body {
+                font-size: 16px;
+            }
 
-    section {
-        page-break-before: always;
-    }
+            section {
+                page-break-before: always;
+            }
 
-    h2, h5, h6 {
-        text-align: center;
-    }
+            h2, h5, h6 {
+                text-align: center;
+            }
 
-    .section_title {
-        font-size: 20px;
-        font-weight: bold;
-        margin-bottom: 1em
-    }
+            .section_title {
+                font-size: 20px;
+                font-weight: bold;
+                margin-bottom: 1em
+            }
 
-    pre {
-        box-sizing: border-box;
-        width: 100%;
-        margin: 0;
-        overflow-y: hidden;
-        font-size: 12px;
-        line-height: 20px;
-        background: #efefef;
-        border: 1px solid #777;
-        padding: 10px;
-        color: #333;
-        overflow-x: auto;
-		white-space: pre-wrap;
-		white-space: -moz-pre-wrap !important;
-		white-space: -o-pre-wrap;
-		word-wrap: break-word;
-    }
-</style>
+            pre {
+                box-sizing: border-box;
+                width: 100%;
+                margin: 0;
+                overflow-y: hidden;
+                font-size: 12px;
+                line-height: 20px;
+                background: #efefef;
+                border: 1px solid #777;
+                padding: 10px;
+                color: #333;
+                overflow-x: auto;
+                white-space: pre-wrap;
+                white-space: -moz-pre-wrap !important;
+                white-space: -o-pre-wrap;
+                word-wrap: break-word;
+            }
+        </style>
+    </head>
 
-<body>
-    <section>
-        <h5 style="margin-top: 6mm">МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РОССИЙСКОЙ ФЕДЕРАЦИИ</h5>
-        <h5 style="margin-top: 10mm">ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ<br>ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ОБРАЗОВАНИЯ</h5>
+    <body>
+        <section style="text-align: center">
+            <p style="margin-top: 6mm">МИНИСТЕРСТВО ОБРАЗОВАНИЯ И НАУКИ РОССИЙСКОЙ ФЕДЕРАЦИИ</p>
+            <p style="margin-top: 10mm">ФЕДЕРАЛЬНОЕ ГОСУДАРСТВЕННОЕ АВТОНОМНОЕ<br>ОБРАЗОВАТЕЛЬНОЕ УЧРЕЖДЕНИЕ ВЫСШЕГО ОБРАЗОВАНИЯ</p>
 
-        <h6 style="margin-top: 14mm">«Санкт-Петербургский национальный исследовательский университет<br>информационных технологий, механики и оптики»</h6>
-        <h6 style="margin-top: 10mm">Факультет информационных технологий и программирования</h6>
-        <h6 style="margin-top: 10mm">Кафедра информационных систем</h6>
+            <p style="margin-top: 14mm">«Санкт-Петербургский национальный исследовательский университет<br>информационных технологий, механики и оптики»</p>
+            <p style="margin-top: 10mm">Факультет информационных технологий и программирования</p>
+            <p style="margin-top: 10mm">Кафедра информационных систем</p>
 
-        <h6 style="margin-top: 26mm">Лабораторная работа №{{ report.task.number }}</h6>
-        <h6 style="margin-top: 2mm; font-weight: bold">{{ report.task.title }}</h6>
+            <p style="margin-top: 26mm">Лабораторная работа №{{ report.task.number }}</p>
+            <p style="margin-top: 2mm; font-weight: bold">{{ report.task.title }}</p>
 
-        <p style="margin-top: 70mm; text-align: right">Выполнил студент группы {{ report.user.student_groups.first.title }}:</p>
-        <p style="margin-top: 2mm; text-align: right">{{ report.username }}</p>
+            <p style="margin-top: 70mm; text-align: right">Выполнил студент группы {{ report.user.student_groups.first.title }}:</p>
+            <p style="margin-top: 2mm; text-align: right">{{ report.username }}</p>
 
-        <h6 style="margin-top: 50mm">САНКТ-ПЕТЕРБУРГ</h6>
-        <h6 style="margin-top: 4mm">{% now 'Y' %}</h6>
-    </section>
-
-    <section>
-        <h2 class="section_title">Задание</h2>
-        {{ report.task.description|safe }}
-    </section>
-
-    <section>
-        <h2 class="section_title">Ход рассуждений</h2>
-        {{ report.solution_text|safe }}
-    </section>
-
-    {% for f in report.files.all %}
-        <section>
-            {% if forloop.first %}
-                <h2 class="section_title">Листинг</h2>
-            {% endif %}
-            <h2 style="font-weight: bold; margin-bottom: 1em">Файл {{ f.file.name|basename }}</h2>
-            <pre style="width: 100%">{{ f.file|file_content }}</pre>
+            <p style="margin-top: 50mm">САНКТ-ПЕТЕРБУРГ</p>
+            <p style="margin-top: 4mm">{% now 'Y' %}</p>
         </section>
-    {% endfor %}
-</body>
+
+        <section>
+            <h2 class="section_title">Задание</h2>
+            {{ report.task.description|safe }}
+        </section>
+
+        <section>
+            <h2 class="section_title">Ход рассуждений</h2>
+            {{ report.solution_text|safe }}
+        </section>
+
+        {% for f in report.files.all %}
+            <section>
+                {% if forloop.first %}
+                    <h2 class="section_title">Листинг</h2>
+                {% endif %}
+                <h2 style="font-weight: bold; margin-bottom: 1em">Файл {{ f.file.name|basename }}</h2>
+                <pre style="width: 100%">{{ f.file|file_content }}</pre>
+            </section>
+        {% endfor %}
+    </body>
+</html>
