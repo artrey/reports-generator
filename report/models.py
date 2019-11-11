@@ -3,6 +3,7 @@ from collections import OrderedDict
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
+from django.utils import timezone
 
 
 class GoogleApiFolder(models.Model):
@@ -133,7 +134,7 @@ class Report(models.Model):
 
 
 def report_path(file: 'File', filename: str) -> str:
-    return f'sources/{file.report.username}/{filename}'
+    return f'sources/{file.report.username}/{file.report.task}/{timezone.now().strftime("%Y%m%d%H%M%S")}/{filename}'
 
 
 class File(models.Model):
