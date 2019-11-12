@@ -154,8 +154,9 @@ class Report(models.Model):
 
 
 def report_path(file: 'File', filename: str) -> str:
+    group = file.report.user.student_groups.first()
     return 'sources/{0}/{1}/{2}/{3}/{4}'.format(
-        file.report.user.student_groups.first().title,
+        group.title if group else 'admin',
         file.report.username,
         file.report.task,
         timezone.now().strftime("%Y%m%d%H%M%S"),
