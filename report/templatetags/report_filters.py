@@ -19,7 +19,7 @@ def humanize_status(raw: str) -> str:
 @register.filter
 def file_content(file) -> str:
     try:
-        return file.read().decode()
+        return file.read().decode(errors='ignore')
     except IOError:
         return ''
 
