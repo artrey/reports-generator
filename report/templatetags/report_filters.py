@@ -8,12 +8,12 @@ register = template.Library()
 @register.filter
 def humanize_status(raw: str) -> str:
     if raw == 'approved':
-        return 'Принятые'
+        return 'Принят'
     elif raw == 'rejected':
-        return 'Отклонённые'
+        return 'Отклонён'
     elif raw == 'verifying':
         return 'На проверке'
-    return 'Все'
+    return 'Неопределённое состояние'
 
 
 @register.filter

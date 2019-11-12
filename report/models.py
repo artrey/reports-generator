@@ -73,20 +73,32 @@ class ReportsFolder(models.Model):
         return f'{self.folder} [{self.group} | {self.task}]'
 
 
+def queryset_approved(queryset):
+    return queryset.filter(approved_at__isnull=False)
+
+
+def queryset_rejected(queryset):
+    return queryset.filter(rejected_at__isnull=False)
+
+
+def queryset_verifying(queryset):
+    return queryset.filter(approved_at__isnull=True,
+                           rejected_at__isnull=True)
+
+
 class ApprovedReportManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(approved_at__isnull=False)
+        return queryset_approved(super().get_queryset())
 
 
 class RejectedReportManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(rejected_at__isnull=False)
+        return queryset_rejected(super().get_queryset())
 
 
 class VerifyingReportManager(models.Manager):
     def get_queryset(self):
-        return super().get_queryset().filter(approved_at__isnull=True,
-                                             rejected_at__isnull=True)
+        return queryset_verifying(super().get_queryset())
 
 
 class Report(models.Model):
@@ -113,6 +125,14 @@ class Report(models.Model):
         elif self.rejected_at:
             return 'rejected'
         return 'verifying'
+
+    @staticmethod
+    def filtered_queryset() -> OrderedDict:
+        return OrderedDict({
+            'approved': queryset_approved,
+            'rejected': queryset_rejected,
+            'verifying': queryset_verifying,
+        })
 
     @staticmethod
     def statuses() -> OrderedDict:

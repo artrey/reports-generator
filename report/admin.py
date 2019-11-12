@@ -86,9 +86,9 @@ class StatusReportFilter(admin.SimpleListFilter):
         return ((x, x) for x in Report.statuses().keys())
 
     def queryset(self, request, queryset):
-        q = Report.statuses().get(self.value())
-        if q:
-            queryset = q.all()
+        filter_func = Report.filtered_queryset().get(self.value())
+        if filter_func:
+            queryset = filter_func(queryset)
         return queryset
 
 
