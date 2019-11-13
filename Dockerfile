@@ -36,4 +36,4 @@ COPY . .
 STOPSIGNAL SIGINT
 
 # Add main executable script and run it
-CMD ["gunicorn", "reports_generator.wsgi", "-w", "4", "-b", "0.0.0.0:8000"]
+CMD ["gunicorn", "reports_generator.wsgi", "-w", "4", "-t", "600", "-b", "0.0.0.0:8000"]
