@@ -115,7 +115,7 @@ class ReportAdmin(admin.ModelAdmin):
         return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
 
     def response_change(self, request, obj: Report):
-        if "_approve" in request.POST:
+        if '_approve' in request.POST or '_approve_without_score' in request.POST:
             obj.approved_at = timezone.now()
             obj.rejected_at = None
             obj.save()
@@ -125,7 +125,9 @@ class ReportAdmin(admin.ModelAdmin):
                 folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
                 if folder:
                     file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)
-                    gapi.update_results(settings.GAPI_RESULT_SHEET, obj, gapi.build_file_link(file_id))
+                    gapi.update_results(
+                        settings.GAPI_RESULT_SHEET, obj, gapi.build_file_link(file_id), '_approve' in request.POST
+                    )
                 else:
                     messages.add_message(request, messages.WARNING,
                                          "Report wasn't upload to Google Drive. Reason: ReportsFolder not found")
@@ -136,7 +138,7 @@ class ReportAdmin(admin.ModelAdmin):
             except Exception as ex:
                 messages.add_message(request, messages.ERROR, f'Some error occurred. Info: {ex}')
 
-        elif "_reject" in request.POST:
+        elif '_reject' in request.POST:
             obj.approved_at = None
             obj.rejected_at = timezone.now()
             obj.save()

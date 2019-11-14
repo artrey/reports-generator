@@ -88,7 +88,7 @@ def get_sheet_data(sheet_id: str, ranges: str) -> dict:
     return sheet['data'][0]
 
 
-def update_results(sheet_id: str, report: Report, file_url: str) -> None:
+def update_results(sheet_id: str, report: Report, file_url: str, need_score: bool=True) -> None:
     group = report.user.student_groups.first().title
 
     get_data = functools.partial(get_sheet_data, sheet_id)
@@ -109,18 +109,26 @@ def update_results(sheet_id: str, report: Report, file_url: str) -> None:
         ) + timedelta(days=1)
     )
 
-    data = get_data(f'{group}!R3C{col + 2}')
-    score = int(re.search(r'(\d+)', data['rowData'][0]['values'][0]['formattedValue']).group(0))
-    if timezone.localtime() >= deadline:
-        offset = timezone.localtime() - deadline
-        score -= (offset.days // 7) + 1
+    if need_score:
+        data = get_data(f'{group}!R3C{col + 2}')
+        score = int(re.search(r'(\d+)', data['rowData'][0]['values'][0]['formattedValue']).group(0))
+        if timezone.localtime() >= deadline:
+            offset = timezone.localtime() - deadline
+            score -= (offset.days // 7) + 1
+
+        ranges = f'{group}!R{row}C{col}:R{row}C{col + 2}'
+        values = [[report.created_at.strftime('%d.%m.%Y'), file_url, score]]
+
+    else:
+        ranges = f'{group}!R{row}C{col}:R{row}C{col + 1}'
+        values = [[report.created_at.strftime('%d.%m.%Y'), file_url]]
 
     services.sheets.spreadsheets().values().batchUpdate(spreadsheetId=sheet_id, body={
         'valueInputOption': 'USER_ENTERED',
         'data': [{
-            'range': f'{group}!R{row}C{col}:R{row}C{col + 2}',
+            'range': ranges,
             'majorDimension': 'ROWS',
-            'values': [[report.created_at.strftime('%d.%m.%Y'), file_url, score]],
+            'values': values,
         }],
         'includeValuesInResponse': False,
     }).execute()
