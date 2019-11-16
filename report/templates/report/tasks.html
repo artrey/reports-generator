@@ -3,6 +3,8 @@
 {% block title %}Задачи{% endblock title %}
 
 {% block report %}
+    <h2 class="text-center">Задачи</h2>
+
     {% for task in object_list %}
         <p>
             <a href="{{ task.get_absolute_url }}" target="_blank" rel="noopener noreferrer">

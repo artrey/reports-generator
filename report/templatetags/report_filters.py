@@ -27,3 +27,12 @@ def file_content(file) -> str:
 @register.filter
 def basename(file) -> str:
     return os.path.basename(file)
+
+
+@register.filter
+def status2color(status: str) -> str:
+    if status == 'approved':
+        return 'green'
+    elif status == 'rejected':
+        return 'red'
+    return 'black'

@@ -38,6 +38,14 @@ class TasksView(LoginRequiredMixin, ListView):
     template_name = 'report/tasks.html'
 
 
+class ReportsView(LoginRequiredMixin, ListView):
+    model = Report
+    template_name = 'report/reports.html'
+
+    def get_queryset(self):
+        return super().get_queryset().filter(user=self.request.user)
+
+
 @login_required
 def pdf_task_view(request, tid: int):
     task = get_object_or_404(Task, pk=tid)

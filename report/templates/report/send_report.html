@@ -1,9 +1,9 @@
 {% extends 'report/base.html' %}
 
-{% block title %}Отправить отчет{% endblock title %}
+{% block title %}Отправить отчёт{% endblock title %}
 
 {% block report %}
-    <h2 class="text-center">Отправить отчет</h2>
+    <h2 class="text-center">Отправить отчёт</h2>
 
     <form action="{% url 'send_report' %}" method="post" enctype="multipart/form-data" class="text-center">
         {% csrf_token %}

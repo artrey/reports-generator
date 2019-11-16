@@ -1,0 +1,12 @@
+{% extends 'report/base.html' %}
+{% load report_filters %}
+
+{% block title %}Мои отчёты | {{ report.username }}{% endblock title %}
+
+{% block report %}
+    <h2 class="text-center">Мои отчёты</h2>
+
+    {% for report in object_list %}
+        <p style="color: {{ report.status|status2color }}">{{ report.created_at }} | {{ report.task }}</p>
+    {% endfor %}
+{% endblock %}
