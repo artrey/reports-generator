@@ -97,7 +97,7 @@ def update_results(sheet_id: str, report: Report, file_url: str, need_score: boo
     row = data['startRow'] + next((idx for idx, c in enumerate(data['rowData'])
                                    if c['values'][0]['formattedValue'].startswith(report.username))) + 1
 
-    data = get_data(f'{group}!B2:V2')
+    data = get_data(f'{group}!C2:W2')
     task_number = str(report.task.number)
     col = data['startColumn'] + next((idx for idx, c in enumerate(data['rowData'][0]['values'])
                                       if c.get('formattedValue', '').endswith(task_number))) + 1
