@@ -102,17 +102,17 @@ def update_results(sheet_id: str, report: Report, file_url: str, need_score: boo
     col = data['startColumn'] + next((idx for idx, c in enumerate(data['rowData'][0]['values'])
                                       if c.get('formattedValue', '').endswith(task_number))) + 1
 
-    data = get_data(f'{group}!R1C{col}')
-    deadline = timezone.make_aware(
-        datetime.strptime(
-            data['rowData'][0]['values'][0]['formattedValue'].split('-')[-1].strip(), '%d.%m.%Y'
-        ) + timedelta(days=1)
-    )
-
     if need_score:
+        data = get_data(f'{group}!R1C{col}')
+        deadline = timezone.make_aware(
+            datetime.strptime(
+                data['rowData'][0]['values'][0]['formattedValue'].split('-')[-1].strip(), '%d.%m.%Y'
+            ) + timedelta(days=1)
+        )
+
         data = get_data(f'{group}!R3C{col + 2}')
         score = int(re.search(r'(\d+)', data['rowData'][0]['values'][0]['formattedValue']).group(0))
-        if timezone.localtime() >= deadline:
+        if report.created_at >= deadline:
             offset = timezone.localtime() - deadline
             score -= (offset.days // 7) + 1
 
