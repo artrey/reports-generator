@@ -95,7 +95,7 @@ def update_results(sheet_id: str, report: Report, file_url: str, need_score: boo
 
     data = get_data(f'{group}!A4:A50')
     row = data['startRow'] + next((idx for idx, c in enumerate(data['rowData'])
-                                   if c['values'][0]['formattedValue'].startswith(report.username))) + 1
+                                   if c['values'][0].get('formattedValue', '').startswith(report.username))) + 1
 
     data = get_data(f'{group}!C2:W2')
     task_number = str(report.task.number)
@@ -113,7 +113,7 @@ def update_results(sheet_id: str, report: Report, file_url: str, need_score: boo
         data = get_data(f'{group}!R3C{col + 2}')
         score = int(re.search(r'(\d+)', data['rowData'][0]['values'][0]['formattedValue']).group(0))
         if report.created_at >= deadline:
-            offset = timezone.localtime() - deadline
+            offset = report.created_at - deadline
             score -= (offset.days // 7) + 1
 
         ranges = f'{group}!R{row}C{col}:R{row}C{col + 2}'
