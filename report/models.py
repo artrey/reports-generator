@@ -165,7 +165,8 @@ def report_path(file: 'File', filename: str) -> str:
 
 
 class File(models.Model):
-    file = models.FileField(verbose_name='Source file', upload_to=report_path)
+    file = models.FileField(verbose_name='Source file', max_length=256,
+                            upload_to=report_path)
     report = models.ForeignKey(Report, on_delete=models.CASCADE,
                                related_name='files', verbose_name='Report')
 
