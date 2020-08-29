@@ -1,7 +1,7 @@
 from django.contrib.admin.views.decorators import staff_member_required
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponse
+from django.http import HttpResponse, Http404
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy
 from django.views.generic import FormView, ListView
@@ -17,7 +17,12 @@ def pdf_report_view(request, rid):
         report = get_object_or_404(Report, pk=rid)
     else:
         report = get_object_or_404(Report, pk=rid, user=request.user)
-    return HttpResponse(report.report_file.file, content_type='application/pdf')
+
+    try:
+        return HttpResponse(report.report_file.file, content_type='application/pdf')
+
+    except Exception:
+        raise Http404()
 
 
 @login_required
@@ -44,7 +49,12 @@ class ReportsView(LoginRequiredMixin, ListView):
 @login_required
 def pdf_task_view(request, tid: int):
     task = get_object_or_404(Task, pk=tid)
-    return HttpResponse(task.task_file.file, content_type='application/pdf')
+
+    try:
+        return HttpResponse(task.task_file.file, content_type='application/pdf')
+
+    except Exception:
+        raise Http404()
 
 
 class SendReportView(LoginRequiredMixin, FormView):
