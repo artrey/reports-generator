@@ -1,4 +1,5 @@
-Django
+django
 weasyprint
 django-ckeditor
 google-api-python-client
+celery

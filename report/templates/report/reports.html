@@ -6,7 +6,30 @@
 {% block report %}
     <h2 class="text-center">Мои отчёты</h2>
 
-    {% for report in object_list %}
-        <p style="color: {{ report.status|status2color }}">{{ report.created_at }} | {{ report.task }}</p>
-    {% endfor %}
+    <table class="table">
+        <thead style="text-align: center;font-weight: bold">
+        <tr>
+            <td>Дата</td>
+            <td>Работа</td>
+            <td>Статус</td>
+            <td>Просмотр</td>
+            <td>Комментарий</td>
+        </tr>
+        </thead>
+        <tbody>
+        {% for report in object_list %}
+            <tr style="background-color: {{ report.status|status2color }}">
+                <td>{{ report.created_at }}</td>
+                <td>{{ report.task }}</td>
+                <td>{{ report.status|humanize_status }}</td>
+                <td>
+                    <a href="{{ report.get_absolute_url }}" target="_blank" rel="noopener noreferrer">
+                        Открыть отчет
+                    </a>
+                </td>
+                <td>{{ report.comment|default:''|safe }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
 {% endblock %}

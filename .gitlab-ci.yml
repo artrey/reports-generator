@@ -1,0 +1,48 @@
+image: artrey/docker-curl-ssh
+
+variables:
+  # When using dind, it's wise to use the overlayfs driver for
+  # improved performance:
+  DOCKER_DRIVER: overlay2
+  REGISTRY: "registry.gitlab.com"
+  CONTAINER_IMAGE: "registry.gitlab.com/artrey/reports-generator"
+  CONTAINER_IMAGE_TAG: "$CONTAINER_IMAGE:v-$CI_PIPELINE_IID"
+  CONTAINER_IMAGE_LATEST: "$CONTAINER_IMAGE:latest"
+
+services:
+  - docker:dind
+
+stages:
+  - build
+  - deploy
+
+build:
+  stage: build
+  before_script:
+    # Login into Docker registry:
+    - docker login -u gitlab-ci-token -p "$CI_JOB_TOKEN" "$REGISTRY"
+    # Debug information:
+    - docker info
+  script:
+    - docker build --pull -t "$CONTAINER_IMAGE_TAG" .
+    - docker push "$CONTAINER_IMAGE_TAG"
+    - docker tag "$CONTAINER_IMAGE_TAG" "$CONTAINER_IMAGE_LATEST"
+    - docker push "$CONTAINER_IMAGE_LATEST"
+  only:
+    - master
+
+deploy:
+  stage: deploy
+  before_script:
+    # Debug information:
+    - curl -V
+    # Setup ssh
+    - eval "$(ssh-agent -s)"
+    - echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
+    - mkdir -p ~/.ssh
+    - chmod 700 ~/.ssh
+    - echo -e "Host *\n\tStrictHostKeyChecking no\n\n" > ~/.ssh/config
+  script:
+    - ssh -o StrictHostKeyChecking=no "$SERVER_USER"@"$SERVER_ADDRESS" "docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $REGISTRY && cd /root/services/rep-gen && ./deploy.sh"
+  only:
+    - master

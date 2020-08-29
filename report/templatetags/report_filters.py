@@ -32,7 +32,7 @@ def basename(file) -> str:
 @register.filter
 def status2color(status: str) -> str:
     if status == 'approved':
-        return 'green'
+        return 'lightgreen'
     elif status == 'rejected':
-        return 'red'
-    return 'black'
+        return 'lightpink'
+    return 'white'

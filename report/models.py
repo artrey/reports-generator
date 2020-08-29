@@ -42,6 +42,10 @@ class Task(models.Model):
     title = models.CharField(verbose_name='Title', max_length=128)
     description = models.TextField(verbose_name='Description')
 
+    @property
+    def name(self) -> str:
+        return f'{self.number}. {self.title}'
+
     class Meta:
         ordering = 'number', 'title',
 
@@ -49,7 +53,20 @@ class Task(models.Model):
         return reverse('task', args=(self.id,))
 
     def __str__(self) -> str:
-        return f'{self.number}. {self.title}'
+        return self.name
+
+
+def task_file_path(task_file: 'TaskFile', filename: str) -> str:
+    ext = filename.rsplit('.', 1)[-1]
+    return f'tasks/{task_file.task.name}.{ext}'
+
+
+class TaskFile(models.Model):
+    task = models.OneToOneField(Task, on_delete=models.CASCADE,
+                                verbose_name='Task', related_name='task_file')
+    file = models.FileField(verbose_name='Task file', max_length=256,
+                            upload_to=task_file_path)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
 
 
 class ReportsFolder(models.Model):
@@ -142,6 +159,9 @@ class Report(models.Model):
             'verifying': Report.verifying_objects,
         })
 
+    def get_absolute_url(self) -> str:
+        return reverse('pdf_report', args=(self.id,))
+
     class Meta:
         ordering = '-created_at',
 
@@ -153,7 +173,25 @@ class Report(models.Model):
         return f'{self.task} | {self.username}'
 
 
-def report_path(file: 'File', filename: str) -> str:
+def report_file_path(report_file: 'ReportFile', filename: str) -> str:
+    group = report_file.report.user.student_groups.first()
+    return 'reports/{0}/{1}/{2}/{3}'.format(
+        group.title if group else 'admin',
+        report_file.report.task,
+        report_file.report.username,
+        filename
+    )
+
+
+class ReportFile(models.Model):
+    report = models.OneToOneField(Report, on_delete=models.CASCADE,
+                                  verbose_name='Report', related_name='report_file')
+    file = models.FileField(verbose_name='Report file', max_length=256,
+                            upload_to=report_file_path)
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
+
+
+def source_report_path(file: 'SourceFile', filename: str) -> str:
     group = file.report.user.student_groups.first()
     return 'sources/{0}/{1}/{2}/{3}/{4}'.format(
         group.title if group else 'admin',
@@ -164,11 +202,15 @@ def report_path(file: 'File', filename: str) -> str:
     )
 
 
-class File(models.Model):
+class SourceFile(models.Model):
     file = models.FileField(verbose_name='Source file', max_length=256,
-                            upload_to=report_path)
+                            upload_to=source_report_path)
     report = models.ForeignKey(Report, on_delete=models.CASCADE,
-                               related_name='files', verbose_name='Report')
+                               related_name='source_files', verbose_name='Report')
 
     def __str__(self) -> str:
         return f'{self.file.path} | {self.report}'
+
+
+# register post actions
+from .post_actions import *

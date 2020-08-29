@@ -132,6 +132,9 @@ STATIC_ROOT = os.getenv('STATIC_ROOT', os.path.join(BASE_DIR, 'static'))
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.getenv('MEDIA_ROOT', os.path.join(BASE_DIR, 'media'))
 
+CELERY_BROKER_URL = os.getenv('CELERY_BROKER_URL', 'redis://localhost:6379/2')
+CELERY_RESULT_BACKEND = os.getenv('CELERY_RESULT_BACKEND', 'redis://localhost:6379/3')
+
 CKEDITOR_UPLOAD_PATH = 'uploads/'
 CKEDITOR_CONFIGS = {
     'default': {
@@ -142,5 +145,7 @@ CKEDITOR_CONFIGS = {
 
 GAPI_SERVICE_ACCOUNT_FILE = os.getenv('GAPI_SERVICE_ACCOUNT_FILE')
 GAPI_RESULT_SHEET = os.getenv('GAPI_RESULT_SHEET')
+
+BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
 
 AdminSite.site_header = 'Reports generator'

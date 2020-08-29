@@ -9,7 +9,7 @@ from django.utils.safestring import mark_safe
 from .forms import TaskAdminForm, ReportAdminForm
 from . import gapi
 from .utils import build_report_pdf
-from .models import GoogleApiFolder, Group, Task, ReportsFolder, Report
+from .models import *
 
 
 def make_link(href: str, title: str = None) -> str:
@@ -92,6 +92,11 @@ class StatusReportFilter(admin.SimpleListFilter):
         return queryset
 
 
+class SourceFileInline(admin.TabularInline):
+    model = SourceFile
+    extra = 0
+
+
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
     form = ReportAdminForm
@@ -106,6 +111,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_filter = 'task', FirstGroupFilter, StatusReportFilter,
     readonly_fields = 'created_at',
     save_on_top = True
+    inlines = SourceFileInline,
 
     def first_group(self, obj: Report) -> Group:
         return obj.user.student_groups.first()
@@ -121,7 +127,7 @@ class ReportAdmin(admin.ModelAdmin):
             obj.save()
 
             try:
-                pdf_content = build_report_pdf(obj, base_url=request.build_absolute_uri())
+                pdf_content = obj.report_file.file.read()
                 folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
                 if folder:
                     file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)

@@ -24,13 +24,13 @@ class ReportAdminForm(forms.ModelForm):
 
 
 class ReportForm(forms.ModelForm):
-    files = forms.FileField(widget=forms.ClearableFileInput(
+    source_files = forms.FileField(widget=forms.ClearableFileInput(
         attrs={'multiple': True}
     ))
 
     class Meta:
         model = Report
-        fields = 'task', 'solution_text', 'files',
+        fields = 'task', 'solution_text', 'source_files',
         widgets = {
             'solution_text': CKEditorUploadingWidget(),
         }

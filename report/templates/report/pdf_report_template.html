@@ -82,7 +82,7 @@
             {{ report.solution_text|safe }}
         </section>
 
-        {% for f in report.files.all %}
+        {% for f in report.source_files.all %}
             <section>
                 {% if forloop.first %}
                     <h2 class="section_title">Листинг</h2>
