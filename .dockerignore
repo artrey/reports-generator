@@ -7,6 +7,7 @@
 !templates/**
 !manage.py
 !requirements.txt
+!start.sh
 
 # Override allowed
 .idea/**

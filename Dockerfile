@@ -31,9 +31,10 @@ RUN pip3 install -r requirements.txt
 
 # Target project
 COPY . .
+RUN chmod +x start.sh
 
 # Valid stopping
 STOPSIGNAL SIGINT
 
 # Add main executable script and run it
-CMD ["gunicorn", "reports_generator.wsgi", "-w", "4", "-t", "600", "-b", "0.0.0.0:8000"]
+CMD ["./start.sh"]
