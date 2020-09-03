@@ -34,7 +34,7 @@ def report_view(request, rid: int):
 
 
 class TasksView(LoginRequiredMixin, ListView):
-    model = Task
+    queryset = Task.get_enabled()
     template_name = 'report/tasks.html'
 
 

@@ -25,4 +25,5 @@ def auto_delete_report_file_on_delete(sender, instance: ReportFile, **kwargs):
 
 @receiver(post_save, sender=Task, dispatch_uid='generate_task_pdf')
 def generate_task_pdf(sender, instance: Task, **kwargs):
-    tasks.generate_task_pdf.delay(instance.id)
+    if instance.enabled:
+        tasks.generate_task_pdf.delay(instance.id)

@@ -27,6 +27,7 @@ class ReportForm(forms.ModelForm):
     source_files = forms.FileField(widget=forms.ClearableFileInput(
         attrs={'multiple': True}
     ))
+    task = forms.ModelChoiceField(queryset=Task.get_enabled())
 
     class Meta:
         model = Report

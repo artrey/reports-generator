@@ -2,6 +2,7 @@ from collections import OrderedDict
 
 from django.contrib.auth.models import User
 from django.db import models
+from django.db.models import QuerySet
 from django.urls import reverse
 from django.utils import timezone
 
@@ -41,10 +42,15 @@ class Task(models.Model):
     number = models.IntegerField(verbose_name='Number')
     title = models.CharField(verbose_name='Title', max_length=128)
     description = models.TextField(verbose_name='Description')
+    enabled = models.BooleanField(verbose_name='Enabled', default=True)
 
     @property
     def name(self) -> str:
         return f'{self.number}. {self.title}'
+
+    @classmethod
+    def get_enabled(cls) -> QuerySet['Task']:
+        return cls.objects.filter(enabled=True)
 
     class Meta:
         ordering = 'number', 'title',

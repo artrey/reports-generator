@@ -47,7 +47,7 @@ class GroupAdmin(admin.ModelAdmin):
 @admin.register(Task)
 class TaskAdmin(admin.ModelAdmin):
     form = TaskAdminForm
-    list_display = 'number', 'title', 'preview',
+    list_display = 'number', 'title', 'preview', 'enabled',
     list_display_links = 'title',
 
     def preview(self, obj: Report) -> str:
