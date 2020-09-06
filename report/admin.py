@@ -54,16 +54,6 @@ class TaskAdmin(admin.ModelAdmin):
         return make_link(reverse('task', args=(obj.id,)), 'Open')
 
 
-@admin.register(ReportsFolder)
-class ReportsFolderAdmin(admin.ModelAdmin):
-    list_display = 'folder', 'group', 'task', 'link',
-    list_filter = 'group', 'task',
-    search_fields = 'group__title', 'task__title', 'folder__title',
-
-    def link(self, obj: ReportsFolder) -> str:
-        return make_link(gapi.build_folder_link(obj.folder.api_id))
-
-
 class FirstGroupFilter(admin.SimpleListFilter):
     title = 'group'
     parameter_name = 'group'
@@ -128,21 +118,23 @@ class ReportAdmin(admin.ModelAdmin):
 
             try:
                 pdf_content = obj.report_file.file.read()
-                folder = ReportsFolder.objects.filter(task=obj.task, group=obj.user.student_groups.first()).first()
-                if folder:
-                    file_id = gapi.upload_file(folder.folder.api_id, build_report_name(obj), pdf_content)
-                    gapi.update_results(
-                        settings.GAPI_RESULT_SHEET, obj, gapi.build_file_link(file_id), '_approve' in request.POST
-                    )
-                else:
-                    messages.add_message(request, messages.WARNING,
-                                         "Report wasn't upload to Google Drive. Reason: ReportsFolder not found")
+                group = obj.user.student_groups.first()
+                if not group:
+                    raise RuntimeError(f'User "{obj.user.get_full_name()}" '
+                                       'is not associated with any group')
+                google_folder_name = f'{group.title}-Lab{obj.task.number:02}'
 
-            except StopIteration:
-                messages.add_message(request, messages.ERROR, f'Error: user or task not found in google sheet')
+                folder = GoogleApiFolder.objects.filter(title=google_folder_name).first()
+                if not folder:
+                    raise RuntimeError("GoogleApiFolder not found: report wasn't uploaded to Google Drive")
+
+                file_id = gapi.upload_file(folder.api_id, build_report_name(obj), pdf_content)
+                gapi.update_results(
+                    settings.GAPI_RESULT_SHEET, obj, gapi.build_file_link(file_id), '_approve' in request.POST
+                )
 
             except Exception as ex:
-                messages.add_message(request, messages.ERROR, f'Some error occurred. Info: {ex}')
+                messages.add_message(request, messages.WARNING, ex)
 
         elif '_reject' in request.POST:
             obj.approved_at = None

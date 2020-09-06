@@ -75,27 +75,6 @@ class TaskFile(models.Model):
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='Created at')
 
 
-class ReportsFolder(models.Model):
-    folder = models.ForeignKey(
-        GoogleApiFolder, on_delete=models.SET_NULL, null=True, blank=True,
-        verbose_name='Google drive folder for storing reports'
-    )
-    group = models.ForeignKey(
-        Group, on_delete=models.CASCADE,
-        verbose_name='Group', related_name='reports_folders'
-    )
-    task = models.ForeignKey(
-        Task, on_delete=models.CASCADE,
-        verbose_name='Task', related_name='reports_folders'
-    )
-
-    class Meta:
-        ordering = 'group', 'task',
-
-    def __str__(self) -> str:
-        return f'{self.folder} [{self.group} | {self.task}]'
-
-
 def queryset_approved(queryset):
     return queryset.filter(approved_at__isnull=False)
 

@@ -52,6 +52,20 @@ class LazyServices:
 services = LazyServices()
 
 
+def get_or_make_google_drive_folder(parent_folder_id: str, folder_name: str) -> str:
+    exists = services.drive.files().list(
+        fields='files(id)', q=f'name contains "{folder_name}" and "{parent_folder_id}" in parents'
+    ).execute()
+    if exists['files']:
+        return exists['files'][0]['id']
+
+    return services.drive.files().create(body={
+        'name': folder_name,
+        'parents': [parent_folder_id],
+        'mimeType': 'application/vnd.google-apps.folder',
+    }).execute().get('id')
+
+
 def build_folder_link(object_id: str) -> str:
     return f'https://drive.google.com/drive/folders/{object_id}'
 
@@ -88,19 +102,32 @@ def get_sheet_data(sheet_id: str, ranges: str) -> dict:
     return sheet['data'][0]
 
 
-def update_results(sheet_id: str, report: Report, file_url: str, need_score: bool=True) -> None:
+def update_results(sheet_id: str, report: Report, file_url: str, need_score: bool = True) -> None:
     group = report.user.student_groups.first().title
 
     get_data = functools.partial(get_sheet_data, sheet_id)
 
     data = get_data(f'{group}!A4:A50')
-    row = data['startRow'] + next((idx for idx, c in enumerate(data['rowData'])
-                                   if c['values'][0].get('formattedValue', '').startswith(report.username))) + 1
+    row_idx = next((
+        idx for idx, c in enumerate(data['rowData'])
+        if c['values'][0].get('formattedValue', '').startswith(report.username)
+    ), None)
+    if row_idx is None:
+        raise RuntimeError(f'Student "{report.username}" not found in Google Sheet')
+
+    row = data['startRow'] + row_idx + 1
 
     data = get_data(f'{group}!C2:W2')
     task_number = str(report.task.number)
-    col = data['startColumn'] + next((idx for idx, c in enumerate(data['rowData'][0]['values'])
-                                      if c.get('formattedValue', '').endswith(task_number))) + 1
+
+    col_idx = next((
+        idx for idx, c in enumerate(data['rowData'][0]['values'])
+        if c.get('formattedValue', '').endswith(task_number)
+    ), None)
+    if col_idx is None:
+        raise RuntimeError(f'Task with number "{task_number}" not found in Google Sheet')
+
+    col = data['startColumn'] + col_idx + 1
 
     if need_score:
         data = get_data(f'{group}!R1C{col}')
