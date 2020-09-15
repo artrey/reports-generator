@@ -84,8 +84,12 @@ WSGI_APPLICATION = 'reports_generator.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': os.path.join(os.getenv('SQLITE_PATH', BASE_DIR), 'db.sqlite3'),
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': os.getenv('POSTGRES_DB', 'rep_gen'),
+        'USER': os.getenv('POSTGRES_USER', 'rep_gen'),
+        'PASSWORD': os.getenv('POSTGRES_PASSWORD', 'rep_gen'),
+        'HOST': os.getenv('POSTGRES_HOST', 'localhost'),
+        'PORT': int(os.getenv('POSTGRES_PORT', 5432)),
     }
 }
 

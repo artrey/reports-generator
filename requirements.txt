@@ -4,3 +4,4 @@ django-ckeditor
 google-api-python-client
 celery
 django-redis
+psycopg2-binary
