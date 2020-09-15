@@ -4,6 +4,7 @@ LABEL maintainer="Alexander Ivanov <oz.sasha.ivanov@gmail.com>"
 
 # Required packages
 RUN apk --update --upgrade --no-cache add \
+    build-base \
     gcc \
     musl-dev \
     jpeg-dev \
@@ -11,6 +12,7 @@ RUN apk --update --upgrade --no-cache add \
     libffi-dev \
     cairo-dev \
     pango-dev \
+    postgresql-dev \
     gdk-pixbuf-dev \
     fontconfig \
     msttcorefonts-installer
