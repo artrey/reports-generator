@@ -6,6 +6,14 @@
             margin-top: 1em;
             margin-bottom: 2em;
         }
+
+        .alert-danger {
+            margin: 1em;
+        }
+
+        .alert-danger > ul {
+            margin: 0;
+        }
     </style>
 {% endblock %}
 
@@ -20,8 +28,9 @@
             <span>
                 Привет, {{ user.get_full_name }}!
             </span>
+            <a href="{% url 'password-change' %}" class="btn btn-info">Сменить пароль</a>
             {% if user.is_superuser %}
-                <a href="/admin/" class="btn btn-primary">Панель администратора</a>
+                <a href="{% url 'admin:index' %}" class="btn btn-primary">Панель администратора</a>
             {% endif %}
             <a href="{% url 'logout' %}" class="btn btn-info">Выйти</a>
         </div>
