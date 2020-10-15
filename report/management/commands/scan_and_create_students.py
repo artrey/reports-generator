@@ -2,7 +2,7 @@ import functools
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
-from report import gapi, models
+from report import gapi, models, utils
 
 
 class Command(BaseCommand):
@@ -59,9 +59,11 @@ class Command(BaseCommand):
                     last_name, first_name, *_ = name.split()
                     student = models.User.objects.filter(username=login).first()
                     if not student:
+                        password = utils.gen_pass()
                         student = models.User.objects.create_user(
-                            login, password=login, first_name=first_name, last_name=last_name
+                            login, password=password, first_name=first_name, last_name=last_name
                         )
+                        self.stdout.write(f'{student.last_name} {student.first_name} {student.username} {password}')
                     students.append(student.id)
 
                 group.users.set(students)
