@@ -1,4 +1,5 @@
 import typing
+from urllib.parse import urlencode
 
 from django.conf import settings
 from django.contrib import admin, messages
@@ -87,6 +88,22 @@ class SourceFileInline(admin.TabularInline):
     extra = 0
 
 
+class ReportsSimilarityInline(admin.TabularInline):
+    model = ReportsSimilarity
+    fk_name = 'left'
+    readonly_fields = 'right', 'ratio', 'compare',
+    extra = 0
+    can_delete = False
+
+    def compare(self, obj: ReportsSimilarity) -> str:
+        return make_link(
+            reverse('reports_comparator', args=(obj.left.task_id,)) + '?' + urlencode({
+                'src': obj.left.id,
+                'dst': obj.right.id,
+            }), 'Compare'
+        )
+
+
 @admin.register(Report)
 class ReportAdmin(admin.ModelAdmin):
     form = ReportAdminForm
@@ -101,7 +118,7 @@ class ReportAdmin(admin.ModelAdmin):
     list_filter = 'task', FirstGroupFilter, StatusReportFilter,
     readonly_fields = 'created_at',
     save_on_top = True
-    inlines = SourceFileInline,
+    inlines = ReportsSimilarityInline, SourceFileInline,
 
     def first_group(self, obj: Report) -> Group:
         return obj.user.student_groups.first()

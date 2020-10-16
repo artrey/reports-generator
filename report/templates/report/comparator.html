@@ -1,0 +1,58 @@
+{% extends 'report/base.html' %}
+
+{% block style %}
+    {{ block.super }}
+    <style>
+        h4 {
+            margin-top: 1em;
+        }
+
+        .diff-card {
+            margin-top: 1em;
+        }
+
+        .diff-card:last-child {
+            margin-bottom: 2em;
+        }
+
+        .diff {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block title %}Простой diff{% endblock title %}
+
+{% block report %}
+    <h3 class="text-center">{{ task.title }}</h3>
+
+    <form method="get" class="text-center">
+        <div class="form-group">
+            <select name="src" aria-label="src">
+                {% for report in reports %}
+                    <option {% if report.id == report_src_id %}selected{% endif %}
+                            value="{{ report.id }}">
+                        {{ report.created_at }} | {{ report.user.student_groups.first }} | {{ report.username }}
+                    </option>
+                {% endfor %}
+            </select>
+            <select name="dst" aria-label="dst">
+                {% for report in reports %}
+                    <option {% if report.id == report_dst_id %}selected{% endif %}
+                            value="{{ report.id }}">
+                        {{ report.created_at }} | {{ report.user.student_groups.first }} | {{ report.username }}
+                    </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <button class="btn btn-success mt-3" type="submit">Сравнить</button>
+    </form>
+
+    <h4 class="text-center">Максимальный коэффициент похожести: {{ ratio|floatformat:3 }}</h4>
+
+    {% for result in results %}
+        <h6 class="text-center">Коэффициент похожести: {{ result.0|floatformat:3 }}</h6>
+        <div class="diff-card">{{ result.1|safe }}</div>
+    {% endfor %}
+{% endblock %}

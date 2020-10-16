@@ -8,7 +8,7 @@ from django.views.generic import FormView, ListView
 
 from report.forms import ReportForm
 from report.models import *
-from report import tasks
+from report import tasks, utils
 
 
 @login_required
@@ -75,9 +75,31 @@ class SendReportView(LoginRequiredMixin, FormView):
             for f in files:
                 SourceFile.objects.create(file=f, report=report)
             tasks.generate_report_pdf.delay(report.id)
+            tasks.check_uniqueness.delay(report.id)
             return self.form_valid(form)
         else:
             return self.form_invalid(form)
 
     def get_success_url(self):
         return reverse('report', args=(self.report_id,))
+
+
+@staff_member_required
+def reports_comparator_view(request, tid: int):
+    report_src_id = request.GET.get('src')
+    report_dst_id = request.GET.get('dst')
+
+    report_src = get_object_or_404(Report, pk=report_src_id, task_id=tid)
+    report_dst = get_object_or_404(Report, pk=report_dst_id, task_id=tid)
+
+    ratio = utils.ratio_reports(report_src, report_dst)
+    results = utils.compare_reports(report_src, report_dst)
+
+    return render(request, 'report/comparator.html', context={
+        'task': get_object_or_404(Task, pk=tid),
+        'reports': Report.objects.filter(task_id=tid),
+        'report_src_id': report_src.id,
+        'report_dst_id': report_dst.id,
+        'results': results,
+        'ratio': ratio,
+    })

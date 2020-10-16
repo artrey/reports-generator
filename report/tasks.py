@@ -6,7 +6,6 @@ from django.core.files.base import ContentFile
 from report import utils
 from report.models import *
 
-
 logger = get_task_logger(__name__)
 
 
@@ -43,5 +42,31 @@ def generate_report_pdf(report_id: int):
         pdf_content, name=f'{timezone.now().strftime("%Y%m%d%H%M%S")}.pdf'
     )
     ReportFile.objects.create(report=report, file=file_data)
+
+    logger.info('Successfully finished')
+
+
+@shared_task(autoretry_for=(Exception,), retry_kwargs={'max_retries': 3},
+             default_retry_delay=10)
+def check_uniqueness(report_id: int):
+    logger.info('Started')
+    report = Report.objects.filter(id=report_id).first()
+
+    if not report:
+        return
+
+    other_reports = list(Report.objects.exclude().filter(
+        task_id=report.task_id
+    ).exclude(user=report.user).prefetch_related('source_files'))
+    if not other_reports:
+        return
+
+    ratio, _, other_report = max(map(
+        lambda x: (utils.ratio_reports(report, x), x.created_at, x), other_reports
+    ))
+
+    ReportsSimilarity.objects.get_or_create(left=report, right=other_report, defaults={
+        'ratio': ratio
+    })
 
     logger.info('Successfully finished')

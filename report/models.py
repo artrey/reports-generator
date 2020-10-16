@@ -197,5 +197,12 @@ class SourceFile(models.Model):
         return f'{self.file.path} | {self.report}'
 
 
-# register post actions
-from .post_actions import *
+class ReportsSimilarity(models.Model):
+    left = models.ForeignKey(Report, on_delete=models.CASCADE,
+                             related_name='similarity_left', verbose_name='Left')
+    right = models.ForeignKey(Report, on_delete=models.CASCADE,
+                              related_name='similarity_right', verbose_name='Right')
+    ratio = models.FloatField(verbose_name='Ratio')
+
+    def __str__(self) -> str:
+        return f'{self.left} <-> {self.right} | {self.ratio}'
