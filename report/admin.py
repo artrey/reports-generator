@@ -111,7 +111,7 @@ class ReportAdmin(admin.ModelAdmin):
 
     list_display = (
         'username', 'first_group', 'task', 'created_at',
-        'approved_at', 'rejected_at', 'comment', 'preview',
+        'approved_at', 'rejected_at', 'comment', 'ratio', 'preview',
     )
     list_display_links = 'username',
     search_fields = 'user__last_name', 'user__first_name', 'task__title',
@@ -126,6 +126,22 @@ class ReportAdmin(admin.ModelAdmin):
 
     def preview(self, obj: Report) -> str:
         return make_link(reverse('pdf_report', args=(obj.id,)), 'Report')
+
+    def ratio_color(self, ratio: typing.Optional[float]) -> str:
+        if not ratio:
+            return ''
+        elif ratio > 0.65:
+            return '#fb8989'
+        if ratio > 0.45:
+            return '#fff98e'
+        return ''
+
+    def ratio(self, obj: Report) -> str:
+        value = obj.similarity_left.first()
+        if value:
+            value = value.ratio
+        value_repr = f'{value:0.3f}' if value else '-'
+        return mark_safe(f'<p style="background-color: {self.ratio_color(value)}">{value_repr}</p>')
 
     def response_change(self, request, obj: Report):
         if '_approve' in request.POST or '_approve_without_score' in request.POST:
