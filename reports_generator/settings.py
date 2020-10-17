@@ -150,6 +150,20 @@ CKEDITOR_CONFIGS = {
 GAPI_SERVICE_ACCOUNT_FILE = os.getenv('GAPI_SERVICE_ACCOUNT_FILE')
 GAPI_RESULT_SHEET = os.getenv('GAPI_RESULT_SHEET')
 
+BLACKLIST_FILE_EXTENSIONS = [
+    # images
+    '.jpg', '.jpeg', '.png', '.bmp', '.ico', '.svg', '.webp', '.gif', '.tiff',
+
+    # docs
+    '.txt', '.pdf', '.doc', '.docx', '.odt', '.xls', '.xlsx', '.ppt', '.pptx',
+
+    # archives
+    '.zip', '.rar', '.7z', '.tar', '.gz', '.xz',
+
+    # other
+    '.exe',
+]
+
 BASE_URL = os.getenv('BASE_URL', 'http://localhost:8000')
 
 AdminSite.site_header = 'Reports generator'

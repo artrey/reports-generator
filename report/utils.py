@@ -4,6 +4,7 @@ import difflib as df
 import typing
 from os.path import basename
 
+from django.conf import settings
 from django.template.loader import render_to_string
 from weasyprint import HTML
 
@@ -84,3 +85,11 @@ def compare_reports(src: Report, dst: Report) -> typing.List[typing.Tuple[float,
         ))
         for ratio, fid1, fid2 in matched_files
     ]
+
+
+def is_valid_filename_ext(extension: str) -> bool:
+    if not extension:
+        return False
+    if extension.lower() in settings.BLACKLIST_FILE_EXTENSIONS:
+        return False
+    return True
