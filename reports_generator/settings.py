@@ -112,6 +112,7 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+LOGIN_URL = reverse_lazy('login')
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.2/topics/i18n/

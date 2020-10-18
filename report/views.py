@@ -48,7 +48,12 @@ class ReportsView(LoginRequiredMixin, ListView):
 
 @login_required
 def pdf_task_view(request, tid: int):
-    task = get_object_or_404(Task, pk=tid)
+    if request.user.is_staff:
+        qs = Task
+    else:
+        qs = Task.get_enabled()
+
+    task = get_object_or_404(qs, pk=tid)
 
     try:
         return HttpResponse(task.task_file.file, content_type='application/pdf')
