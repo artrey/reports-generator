@@ -7,16 +7,26 @@
             margin-top: 1em;
         }
 
-        .diff-card {
+        .files {
+            display: flex;
+            flex-direction: column;
+            align-content: center;
+        }
+
+        .diff-file {
             margin-top: 1em;
         }
 
-        .diff-card:last-child {
-            margin-bottom: 2em;
+        .diff-file:last-child {
+            margin-bottom: 1em;
+        }
+
+        .diff-card {
+            overflow-x: auto;
         }
 
         .diff {
-            width: 100%;
+            margin: 0 auto;
         }
     </style>
 {% endblock %}
@@ -50,9 +60,15 @@
     </form>
 
     <h4 class="text-center">Максимальный коэффициент похожести: {{ ratio|floatformat:3 }}</h4>
+{% endblock %}
 
-    {% for result in results %}
-        <h6 class="text-center">Коэффициент похожести: {{ result.0|floatformat:3 }}</h6>
-        <div class="diff-card">{{ result.1|safe }}</div>
-    {% endfor %}
+{% block after_container %}
+    <section class="files">
+        {% for result in results %}
+            <div class="diff-file">
+                <h6 class="text-center">Коэффициент похожести: {{ result.0|floatformat:3 }}</h6>
+                <div class="diff-card">{{ result.1|safe }}</div>
+            </div>
+        {% endfor %}
+    </section>
 {% endblock %}
