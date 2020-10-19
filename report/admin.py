@@ -90,8 +90,8 @@ class SourceFileInline(admin.TabularInline):
 
 class ReportsSimilarityInline(admin.TabularInline):
     model = ReportsSimilarity
-    fk_name = 'left'
-    readonly_fields = 'right', 'ratio', 'compare',
+    fk_name = 'right'
+    readonly_fields = 'left', 'ratio', 'compare',
     extra = 0
     can_delete = False
 
@@ -130,14 +130,14 @@ class ReportAdmin(admin.ModelAdmin):
     def ratio_color(self, ratio: typing.Optional[float]) -> str:
         if not ratio:
             return ''
-        elif ratio > 0.65:
+        elif ratio > 0.45:
             return '#fb8989'
-        if ratio > 0.45:
+        if ratio > 0.25:
             return '#fff98e'
         return ''
 
     def ratio(self, obj: Report) -> str:
-        value = obj.similarity_left.first()
+        value = obj.similarity_right.first()
         if value:
             value = value.ratio
         value_repr = f'{value:0.3f}' if value else '-'

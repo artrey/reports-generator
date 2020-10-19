@@ -78,7 +78,7 @@ def ratio_reports(src: Report, dst: Report) -> float:
 def compare_reports(src: Report, dst: Report) -> typing.List[typing.Tuple[float, str]]:
     matched_files, files_names, files_contents = match_files_by_ratio(src, dst)
 
-    return [
+    compared = [
         (ratio, df.HtmlDiff(tabsize=4).make_file(
             files_contents[fid1].decode().splitlines(),
             files_contents[fid2].decode().splitlines(),
@@ -86,6 +86,10 @@ def compare_reports(src: Report, dst: Report) -> typing.List[typing.Tuple[float,
         ))
         for ratio, fid1, fid2 in matched_files
     ]
+
+    # TODO: add to compared added and removed files
+
+    return compared
 
 
 def is_valid_filename_ext(extension: str) -> bool:

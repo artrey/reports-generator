@@ -62,10 +62,10 @@ def check_uniqueness(report_id: int):
         return
 
     ratio, _, other_report = max(map(
-        lambda x: (utils.ratio_reports(report, x), x.created_at, x), other_reports
+        lambda x: (utils.ratio_reports(x, report), x.created_at, x), other_reports
     ))
 
-    ReportsSimilarity.objects.get_or_create(left=report, right=other_report, defaults={
+    ReportsSimilarity.objects.get_or_create(left=other_report, right=report, defaults={
         'ratio': ratio
     })
 
