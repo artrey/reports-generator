@@ -141,7 +141,7 @@ def update_results(sheet_id: str, report: Report, file_url: str, need_score: boo
         score = int(re.search(r'(\d+)', data['rowData'][0]['values'][0]['formattedValue']).group(0))
         if report.created_at >= deadline:
             offset = report.created_at - deadline
-            score -= (offset.days // 7) + 1
+            score -= (offset.days // 14) + 1
 
         ranges = f'{group}!R{row}C{col}:R{row}C{col + 2}'
         values = [[report.created_at.strftime('%d.%m.%Y'), file_url, score]]
